@@ -13,42 +13,33 @@ static void update_movement(Layer *layer, GContext *ctx) {
   time_t epoch = time(NULL);
 	struct tm *t = localtime(&epoch);
   
-  int32_t hour_angle = (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6);
-  int32_t minute_angle = TRIG_MAX_ANGLE * t->tm_min / 60; //  Create minute path
-
-  int hourY = cos_lookup(hour_angle) / TRIG_MAX_RATIO + 84;
-  int hourX = sin_lookup(hour_angle) / TRIG_MAX_RATIO + 72;
-  int minY = -56 * cos_lookup(minute_angle) / TRIG_MAX_RATIO + 84; // Get the Y position
-  int minX = 56 * sin_lookup(minute_angle) / TRIG_MAX_RATIO + 72; // Get the X position
-  
-  if (hour >= 11 || hour <= 1) {
-    hourY = 0;
-  }
-  else if (hour >= 2 && hour <= 4) {
-    hourX = 94;
-  }
-  else if (hour >= 5 && hour <= 7) {
-    hourY = 118;
-  }
-  else if (hour >= 8 && hour <= 10) {
-    hourX = 0;
-  }
-  
-  if (minute >= 55 || minute <= 5) {
+  if (minute >= 54 || minute <= 6) {
+    if (minute >= 54) {
+      minute = minute % 6;
+    }
+    else if (minute <= 6) {
+      minute = minute + 6;
+    }
     minY = 0;
+    minX = positionsX[minute];
   }
-  else if (minute >= 9 && minute <= 25) {
+  else if (minute >= 7 && minute <= 23) {
+    minute = minute - 7;
+    minY = positionsY[minute];
     minX = 94;
   }
-  else if (minute >= 26 && minute <= 35) {
-    minY = 118;
+  else if (minute >= 24 && minute <= 36) {
+    minute = minute % 12;
+    minY = 128;
+    minX = positionsXI[minute];
   }
-  else if (minute >= 36 && minute <= 54) {
+  else if (minute >= 37 && minute <= 53) {
+    minute = minute - 37;
+    minY = positionsYI[minute];
     minX = 0;
   }
-  
-  LOG("Hour Y is %d, Hour X is %d", hourY, hourX);
-  LOG("Min Y is %d, Min X is %d", minY, minX);
+  hourY = 1;
+  hourX = 1;
   
   hourbox = GRect(hourX,hourY,50,50);
   minutebox = GRect(minX,minY,50,50);
